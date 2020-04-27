@@ -124,6 +124,22 @@ Amf0Data *Amf0Data::create_amf0data(SimpleBuffer *sb)
             }
             return value;
         }
+        case AMF0_MARKER::AMF0_MARKER_NULL: {
+            Amf0Null *value = new Amf0Null();
+            if (value->read(sb) != ERROR_SUCCESS) {
+                freep(value);
+                return nullptr;
+            }
+            return value;
+        }
+        case AMF0_MARKER::AMF0_MARKER_UNDEFINED: {
+            Amf0Undefined *value = new Amf0Undefined();
+            if (value->read(sb) != ERROR_SUCCESS) {
+                freep(value);
+                return nullptr;
+            }
+            return value;
+        }
         case AMF0_MARKER::AMF0_MARKER_ECMA_ARRAY: {
             Amf0EcmaArray *value = new Amf0EcmaArray();
             if (value->read(sb) != ERROR_SUCCESS) {
@@ -592,7 +608,9 @@ int Amf0EcmaArray::read(SimpleBuffer *sb)
     }
 
     int32_t count = sb->read_4bytes();
-    for (int i = 0; i < count && !sb->empty(); i++) {
+    // just for compatibility
+    // for (int i = 0; i < count && !sb->empty(); i++) {
+    while (!sb->empty()) {
         if (!sb->require(2)) {
             ret = ERROR_AMF0_DECODE;
             return ret;
@@ -621,8 +639,6 @@ int Amf0EcmaArray::read(SimpleBuffer *sb)
 
         std::string property_name = sb->read_string(len);
         put(property_name, Amf0Data::create_amf0data(sb));
-
-        i++;
     }
 
     return ret;
