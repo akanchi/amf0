@@ -10,6 +10,7 @@ class SimpleBuffer
 {
 public:
     SimpleBuffer();
+    SimpleBuffer(int32_t size, int8_t value);
     virtual ~SimpleBuffer();
 
 public:
@@ -19,6 +20,7 @@ public:
     void write_4bytes(int32_t val);
     void write_8bytes(int64_t val);
     void write_string(std::string val);
+    void append(const char* bytes, int size);
 
 public:
     int8_t read_1byte();
@@ -34,6 +36,9 @@ public:
     bool empty();
     int size();
     int pos();
+    char *data();
+    void clear();
+    void set_data(int pos, const char *data, int len);
 
 public:
     std::string to_string();

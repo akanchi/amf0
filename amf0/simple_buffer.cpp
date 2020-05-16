@@ -9,6 +9,12 @@ SimpleBuffer::SimpleBuffer()
 {
 }
 
+SimpleBuffer::SimpleBuffer(int32_t size, int8_t value)
+    : _pos(0)
+{
+    _data = std::vector<char>(size, value);
+}
+
 SimpleBuffer::~SimpleBuffer()
 {
 }
@@ -57,6 +63,14 @@ void SimpleBuffer::write_8bytes(int64_t val)
 void SimpleBuffer::write_string(std::string val)
 {
     std::copy(val.begin(), val.end(), std::back_inserter(_data));
+}
+
+void SimpleBuffer::append(const char* bytes, int size)
+{
+    if (!bytes || size <= 0)
+        return;
+
+    _data.insert(_data.end(), bytes, bytes + size);
 }
 
 int8_t SimpleBuffer::read_1byte()
@@ -164,6 +178,31 @@ int SimpleBuffer::size()
 int SimpleBuffer::pos()
 {
     return _pos;
+}
+
+char *SimpleBuffer::data()
+{
+    return (size() == 0) ? nullptr : &_data[0];
+}
+
+void SimpleBuffer::clear()
+{
+    _pos = 0;
+    _data.clear();
+}
+
+void SimpleBuffer::set_data(int pos, const char *data, int len)
+{
+    if (!data)
+        return;
+
+    if (pos + len > size()) {
+        return;
+    }
+
+    for (int i = 0; i < len; i++) {
+        _data[pos + i] = data[i];
+    }
 }
 
 std::string SimpleBuffer::to_string()
